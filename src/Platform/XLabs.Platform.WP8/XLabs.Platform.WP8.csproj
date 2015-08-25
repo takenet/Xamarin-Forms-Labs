@@ -144,6 +144,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="NuGetReferenceHintPathRewrite.targets" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
