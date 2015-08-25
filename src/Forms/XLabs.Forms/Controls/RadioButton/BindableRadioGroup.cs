@@ -16,7 +16,7 @@ namespace XLabs.Forms.Controls
         }
 
         public static BindableProperty ItemsSourceProperty =
-            BindableProperty.Create<BindableRadioGroup, IEnumerable>(o => o.ItemsSource, default(IEnumerable));
+            BindableProperty.Create<BindableRadioGroup, IEnumerable>(o => o.ItemsSource, default(IEnumerable), propertyChanged: OnItemsSourceChanged);
 
         public static BindableProperty SelectedIndexProperty =
             BindableProperty.Create<BindableRadioGroup, int>(o => o.SelectedIndex, default(int), BindingMode.TwoWay,
@@ -47,30 +47,11 @@ namespace XLabs.Forms.Controls
             set
             {
                 SetValue(ItemsSourceProperty, value);
-
-                Items.Clear();
-                Children.Clear();
-
-                var radIndex = 0;
-
-                foreach (var item in ItemsSource)
-                {
-                    var button = new CustomRadioButton
-                    {
-                        Text = item.ToString(),
-                        Id = radIndex++,
-                        TextColor = TextColor,
-                        FontSize = Device.GetNamedSize(NamedSize.Small, this), 
-                        FontName = FontName
-                    };
-
-                    button.CheckedChanged += OnCheckedChanged;
-
-                    Items.Add(button);
-
-                    Children.Add(button);
-                }
             }
+        }
+
+        private IEnumerable GetItemsSource() {
+            return ItemsSource;
         }
 
         public int SelectedIndex
@@ -82,7 +63,10 @@ namespace XLabs.Forms.Controls
         public Color TextColor
         {
             get { return (Color)GetValue(TextColorProperty); }
-            set { SetValue(TextColorProperty, value); }
+            set
+            {
+                SetValue(TextColorProperty, value);
+            }
         }
 
         /// <summary>
@@ -118,6 +102,33 @@ namespace XLabs.Forms.Controls
         }
 
         public event EventHandler<int> CheckedChanged;
+
+        private static void OnItemsSourceChanged(BindableObject bindable, IEnumerable oldValue, IEnumerable newValue)
+        {
+            var radButtons = bindable as BindableRadioGroup;
+            radButtons.Items.Clear();
+            radButtons.Children.Clear();
+
+            var radIndex = 0;
+
+            foreach (var item in radButtons.ItemsSource)
+            {
+                var button = new CustomRadioButton
+                {
+                    Text = item.ToString(),
+                    Id = radIndex++,
+                    TextColor = radButtons.TextColor,
+                    FontSize = Device.GetNamedSize(NamedSize.Small, radButtons),
+                    FontName = radButtons.FontName
+                };
+
+                button.CheckedChanged += radButtons.OnCheckedChanged;
+
+                radButtons.Items.Add(button);
+
+                radButtons.Children.Add(button);
+            }
+        }
 
         private void OnCheckedChanged(object sender, EventArgs<bool> e)
         {

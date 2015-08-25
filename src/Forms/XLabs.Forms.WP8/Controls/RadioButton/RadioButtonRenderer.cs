@@ -84,6 +84,7 @@ namespace XLabs.Forms.Controls
             }
 
             Control.FontSize = (Element.FontSize > 0) ? (float)Element.FontSize : 12.0f;
+            Control.Foreground = Element.TextColor.ToBrush();
         }
     }
 }
