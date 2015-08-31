@@ -61,6 +61,14 @@ namespace XLabs.Sample.Droid
         {
             base.OnCreate(bundle);
 
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat) 
+            {
+                Android.Webkit.WebView.SetWebContentsDebuggingEnabled(true); 
+            }
+
+            XLabs.Forms.Controls.HybridWebViewRenderer.GetWebViewClientDelegate = r => new CustomClient(r);
+            XLabs.Forms.Controls.HybridWebViewRenderer.GetWebChromeClientDelegate = r => new CustomChromeClient();
+
             if (!Resolver.IsSet)
             {
                 this.SetIoc();
@@ -68,12 +76,10 @@ namespace XLabs.Sample.Droid
             else
             {
                 var app = Resolver.Resolve<IXFormsApp>() as IXFormsApp<XFormsApplicationDroid>;
-                app.AppContext = this;
+                if (app != null) app.AppContext = this;
             }
 
             Forms.Init(this, bundle);
-
-            App.Init();
 
             Forms.ViewInitialized += (sender, e) =>
             {
@@ -83,7 +89,7 @@ namespace XLabs.Sample.Droid
                 }
             };
 
-            this.SetPage(App.GetMainPage());
+            this.LoadApplication(new App());
         }
 
         /// <summary>
